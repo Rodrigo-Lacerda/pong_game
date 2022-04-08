@@ -1,3 +1,4 @@
+from tkinter import font
 import pygame, sys, time
 from players import Player
 
@@ -18,6 +19,11 @@ player2 = Player(WIDTH - 40, HEIGHT/2 - 50)
 player2_pos_y = player2.rect.y
 player2_speed = 250
 
+game_state = 'game_menu'
+
+pygame.init()
+pygame.font.init()
+
 # GameLoop 
 previous_time = time.time()
 while True:
@@ -29,40 +35,57 @@ while True:
             quit()
             sys.exit()
     
-    # Game Logic 
-    # Movimento da bola com deltatime
-    ball_pos_x += ball_speed_x * dt # Eixo X
-    ball.x = ball_pos_x
-    ball_pos_y += ball_speed_y * dt # Eixo Y
-    ball.y = ball_pos_y
-    
-    # USAR INPUTS DE TECLADO AQUI  
-    keys = pygame.key.get_pressed() 
-    if keys[pygame.K_w] and player1.rect.top > 5: 
-        player1.move_up = True
-    else: player1.move_up = False
-    if keys[pygame.K_s] and player1.rect.bottom < (HEIGHT-5):
-        player1.move_down = True
-    else: player1.move_down = False
-    player1.update(dt)
+    # Game Logic
+    if game_state == 'game_menu':
+        font_menu = pygame.font.Font('fonts/roboto.ttf', 35)
+        iniciar = font_menu.render('Play', True, 'white', None)
+        sair = font_menu.render('Quit', True, 'White', None)
 
-    # Movimento do Player 2
-    if player2.rect.bottom < ball.top:
-        player2_pos_y += player2_speed * dt
-        player2.rect.y = player2_pos_y
-    if player2.rect.top > ball.bottom:
-        player2_pos_y -= player2_speed * dt
-        player2.rect.y = player2_pos_y
+        screen.blit(iniciar, (50, 50),)
+        screen.blit(sair, (50, 90))
 
-    # condição de colisão
-    if ball.colliderect(player2.rect) or ball.colliderect(player1.rect):
-        ball_speed_x = -ball_speed_x
-    if ball.bottom >= (HEIGHT-5) or ball.top <= 5:  
-        ball_speed_y = -ball_speed_y
+    if game_state == 'game_play': 
+        # Movimento da bola com deltatime
+        ball_pos_x += ball_speed_x * dt # Eixo X
+        ball.x = ball_pos_x
+        ball_pos_y += ball_speed_y * dt # Eixo Y
+        ball.y = ball_pos_y
+        
+        # USAR INPUTS DE TECLADO AQUI  
+        keys = pygame.key.get_pressed() 
+        if keys[pygame.K_w] and player1.rect.top > 5: 
+            player1.move_up = True
+        else: player1.move_up = False
+        if keys[pygame.K_s] and player1.rect.bottom < (HEIGHT-5):
+            player1.move_down = True
+        else: player1.move_down = False
+        player1.update(dt)
 
-    # Render Game
-    pygame.draw.ellipse(screen, 'white', ball, 100)
-    player1.render(screen, 'cyan')
-    player2.render(screen, 'red')
-    
+        # Movimento do Player 2
+        if player2.rect.bottom < ball.top:
+            player2_pos_y += player2_speed * dt
+            player2.rect.y = player2_pos_y
+        if player2.rect.top > ball.bottom:
+            player2_pos_y -= player2_speed * dt
+            player2.rect.y = player2_pos_y
+
+        # condição de colisão
+        if ball.colliderect(player2.rect) or ball.colliderect(player1.rect):
+            ball_speed_x = -ball_speed_x
+        if ball.bottom >= (HEIGHT-5) or ball.top <= 5:  
+            ball_speed_y = -ball_speed_y
+
+        # Render Game
+        pygame.draw.ellipse(screen, 'white', ball, 100)
+        player1.render(screen, 'cyan')
+        player2.render(screen, 'red')
+
+    if game_state == 'game_over':
+        font_menu = pygame.font.Font('fonts/roboto.ttf', 35)
+        inicio = font_menu.render('Menu', True, 'White', None)
+        quit = font_menu.render('Quit', True, 'White', None)
+
+        screen.blit(inicio, (50, 50))
+        screen.blit(quit, (50, 90))
+
     pygame.display.update()
